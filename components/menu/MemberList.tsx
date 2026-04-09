@@ -4,6 +4,19 @@ import { useEffect, useRef, useState } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
 import { Member } from '@/types';
 
+const PRESET_COLORS = [
+  '#FF3B30', // 赤
+  '#FF9500', // オレンジ
+  '#FFCC00', // 黄
+  '#34C759', // 緑
+  '#00C7BE', // シアン
+  '#007AFF', // 青
+  '#5856D6', // 紫
+  '#FF2D55', // ピンク
+  '#FFFFFF', // 白
+  '#8E8E93', // グレー
+];
+
 type MemberItemProps = {
   member: Member;
   projectId: string;
@@ -46,58 +59,78 @@ function MemberItem({ member, projectId }: MemberItemProps) {
   };
 
   return (
-    <div className="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-800 transition-colors group">
-      {/* カラーピッカー（色丸をタップ） */}
-      <label className="relative flex-shrink-0 cursor-pointer">
+    <div className="bg-gray-800/50 rounded-xl p-3 space-y-2">
+      {/* 上段：色丸 + 名前 + 削除 */}
+      <div className="flex items-center gap-2">
         <div
-          className="w-9 h-9 rounded-full border-2 border-white/20 hover:border-white/50 transition-colors"
+          className="w-8 h-8 rounded-full flex-shrink-0 border-2 border-white/30"
           style={{ backgroundColor: color }}
         />
-        <input
-          type="color"
-          value={color}
-          onChange={(e) => handleColorChange(e.target.value)}
-          className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-          aria-label="カラーを変更"
-        />
-      </label>
-
-      {/* 名前（タップで編集） */}
-      <div className="flex-1 min-w-0">
-        {isEditingName ? (
-          <input
-            ref={inputRef}
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={saveName}
-            onKeyDown={handleNameKeyDown}
-            placeholder="名前を入力"
-            className="w-full bg-gray-700 text-white text-sm rounded px-2 py-1 outline-none focus:ring-2 focus:ring-pink-500"
-          />
-        ) : (
-          <button
-            onClick={() => setIsEditingName(true)}
-            className="w-full text-left text-sm truncate py-1 px-2 rounded hover:bg-gray-700 transition-colors"
-          >
-            {name
-              ? <span className="text-white">{name}</span>
-              : <span className="text-gray-500 italic">名前未設定（タップで編集）</span>
-            }
-          </button>
-        )}
+        <div className="flex-1 min-w-0">
+          {isEditingName ? (
+            <input
+              ref={inputRef}
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={saveName}
+              onKeyDown={handleNameKeyDown}
+              placeholder="名前を入力"
+              className="w-full bg-gray-700 text-white text-sm rounded px-2 py-1 outline-none focus:ring-2 focus:ring-pink-500"
+            />
+          ) : (
+            <button
+              onClick={() => setIsEditingName(true)}
+              className="w-full text-left text-sm truncate py-1 px-1 rounded hover:bg-gray-700 transition-colors"
+            >
+              {name
+                ? <span className="text-white">{name}</span>
+                : <span className="text-gray-500 italic">名前未設定（タップで編集）</span>
+              }
+            </button>
+          )}
+        </div>
+        <button
+          onClick={() => deleteMember(projectId, member.id)}
+          className="min-h-[36px] min-w-[36px] flex items-center justify-center text-gray-600 hover:text-red-400 transition-colors"
+          aria-label="削除"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
-      {/* 削除ボタン */}
-      <button
-        onClick={() => deleteMember(projectId, member.id)}
-        className="min-h-[36px] min-w-[36px] flex items-center justify-center text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-        aria-label="削除"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+      {/* 下段：プリセットカラー＋カスタムカラーピッカー */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {PRESET_COLORS.map((preset) => (
+          <button
+            key={preset}
+            onClick={() => handleColorChange(preset)}
+            className="w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 active:scale-95 flex-shrink-0"
+            style={{
+              backgroundColor: preset,
+              borderColor: color === preset ? '#fff' : 'rgba(255,255,255,0.2)',
+              transform: color === preset ? 'scale(1.15)' : undefined,
+            }}
+            aria-label={preset}
+          />
+        ))}
+        {/* カスタムカラーピッカー */}
+        <label className="relative w-7 h-7 rounded-full border-2 border-dashed border-white/30 hover:border-white/60 transition-colors cursor-pointer flex items-center justify-center flex-shrink-0"
+          title="カスタムカラー"
+        >
+          <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          <input
+            type="color"
+            value={color}
+            onChange={(e) => handleColorChange(e.target.value)}
+            className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+          />
+        </label>
+      </div>
     </div>
   );
 }
