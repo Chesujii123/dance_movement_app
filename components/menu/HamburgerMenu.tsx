@@ -77,11 +77,13 @@ export default function HamburgerMenu({ onEdit, onVideoChange }: HamburgerMenuPr
       {/* ハンバーガーボタン */}
       <button
         onClick={() => setIsOpen(true)}
-        className="min-h-[44px] min-w-[44px] flex items-center justify-center text-white"
-        aria-label="メニュー"
+        className="min-h-[44px] min-w-[44px] flex items-center justify-center text-white hover:text-pink-400 transition-colors"
+        aria-label="メニューを開く"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
+          <line x1="3" y1="6"  x2="21" y2="6"  strokeLinecap="round" />
+          <line x1="3" y1="12" x2="21" y2="12" strokeLinecap="round" />
+          <line x1="3" y1="18" x2="21" y2="18" strokeLinecap="round" />
         </svg>
       </button>
 

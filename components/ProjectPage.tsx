@@ -58,19 +58,15 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
     const url = URL.createObjectURL(file);
     sessionStorage.setItem(`video_${projectId}`, url);
     setVideoUrl(url);
-    // inputをリセットして同じファイルも再選択できるようにする
     e.target.value = '';
   };
 
-  // ダブルタップ検出
   const handleVideoAreaTap = () => {
     if (doubleTapTimerRef.current) {
-      // 2回目のタップ → ダブルタップ確定
       clearTimeout(doubleTapTimerRef.current);
       doubleTapTimerRef.current = null;
       fileInputRef.current?.click();
     } else {
-      // 1回目のタップ → 300ms待つ
       doubleTapTimerRef.current = setTimeout(() => {
         doubleTapTimerRef.current = null;
       }, 300);
@@ -79,8 +75,9 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
 
   return (
     <div className="h-screen flex flex-col bg-gray-950 overflow-hidden">
-      {/* ヘッダー */}
-      <div className="flex items-center px-3 py-2 bg-gray-900 border-b border-gray-800 flex-shrink-0">
+
+      {/* ヘッダー：左に戻るボタン、中央にタイトル、右にハンバーガーメニュー */}
+      <div className="flex items-center px-2 py-1 bg-gray-900 border-b border-gray-800 flex-shrink-0">
         <button
           onClick={() => router.push('/')}
           className="min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-white"
@@ -90,9 +87,17 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
+
         <h1 className="flex-1 text-white text-sm font-medium truncate px-2">
           {currentProject.title}
         </h1>
+
+        {/* ハンバーガーメニュー（ヘッダー右上） */}
+        <HamburgerMenu
+          onEdit={enterEditMode}
+          onVideoChange={() => fileInputRef.current?.click()}
+        />
+
         <input
           ref={fileInputRef}
           type="file"
@@ -111,7 +116,6 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
         onMouseLeave={() => setShowDoubleTapHint(false)}
       >
         <VideoPlayer className="w-full h-full" />
-        {/* ダブルタップヒント（動画あり・ホバー時） */}
         {videoUrl && showDoubleTapHint && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <span className="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full">
@@ -126,16 +130,11 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
         <FloorMap className="absolute inset-0" />
       </div>
 
-      {/* 編集モードツールバー or 再生コントロール */}
+      {/* 再生コントロール or 編集ツールバー */}
       {isEditMode ? (
         <EditorToolbar />
       ) : (
-        <div className="flex items-center bg-gray-900 border-t border-gray-800 flex-shrink-0">
-          <HamburgerMenu onEdit={enterEditMode} onVideoChange={() => fileInputRef.current?.click()} />
-          <div className="flex-1">
-            <PlayerControls />
-          </div>
-        </div>
+        <PlayerControls className="flex-shrink-0" />
       )}
     </div>
   );
