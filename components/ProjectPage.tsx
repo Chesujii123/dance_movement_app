@@ -93,12 +93,6 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
         <h1 className="flex-1 text-white text-sm font-medium truncate px-2">
           {currentProject.title}
         </h1>
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="min-h-[44px] px-3 text-pink-400 hover:text-pink-300 text-sm"
-        >
-          {videoUrl ? '動画を変更' : '動画を読み込む'}
-        </button>
         <input
           ref={fileInputRef}
           type="file"
@@ -137,7 +131,7 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
         <EditorToolbar />
       ) : (
         <div className="flex items-center bg-gray-900 border-t border-gray-800 flex-shrink-0">
-          <HamburgerMenu onEdit={enterEditMode} />
+          <HamburgerMenu onEdit={enterEditMode} onVideoChange={() => fileInputRef.current?.click()} />
           <div className="flex-1">
             <PlayerControls />
           </div>

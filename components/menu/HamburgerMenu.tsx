@@ -11,9 +11,10 @@ import MemberList from './MemberList';
 
 type HamburgerMenuProps = {
   onEdit: () => void;
+  onVideoChange: () => void;
 };
 
-export default function HamburgerMenu({ onEdit }: HamburgerMenuProps) {
+export default function HamburgerMenu({ onEdit, onVideoChange }: HamburgerMenuProps) {
   const t = useTranslations('common');
   const tShare = useTranslations('share');
   const tExport = useTranslations('export');
@@ -26,7 +27,7 @@ export default function HamburgerMenu({ onEdit }: HamburgerMenuProps) {
 
   const { currentProject } = useProjectStore();
   const { isEditMode } = useEditorStore();
-  const { isPlaying, videoElement } = usePlayerStore();
+  const { isPlaying, videoUrl, videoElement } = usePlayerStore();
 
   const handleShare = async () => {
     if (!currentProject) return;
@@ -114,6 +115,13 @@ export default function HamburgerMenu({ onEdit }: HamburgerMenuProps) {
 
               {/* アクションボタン */}
               <div className="space-y-2">
+                <button
+                  onClick={() => { setIsOpen(false); onVideoChange(); }}
+                  className="w-full min-h-[44px] bg-gray-700 hover:bg-gray-600 active:bg-gray-800 text-white rounded-lg text-sm transition-colors"
+                >
+                  {videoUrl ? '動画を変更' : '動画を読み込む'}
+                </button>
+
                 {!isPlaying && (
                   <button
                     onClick={handleEdit}
