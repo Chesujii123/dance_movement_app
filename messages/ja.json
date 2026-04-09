@@ -1,0 +1,72 @@
+{
+  "common": {
+    "edit": "編集",
+    "done": "完了",
+    "add": "追加",
+    "delete": "削除",
+    "undo": "元に戻す",
+    "share": "共有",
+    "export": "書き出し",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "close": "閉じる",
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました"
+  },
+  "player": {
+    "play": "再生",
+    "pause": "一時停止",
+    "loadVideo": "動画を読み込む",
+    "loadVideoDescription": "ローカルの動画ファイルを選択してください",
+    "selectFile": "ファイルを選択",
+    "supportedFormats": "対応形式: MP4, MOV, WebM"
+  },
+  "editor": {
+    "enterEditMode": "編集モードに入りました",
+    "exitEditMode": "編集モードを終了しました",
+    "addMember": "メンバーを追加",
+    "deleteMember": "メンバーを削除",
+    "addKeyframe": "キーフレームを追加",
+    "deleteKeyframe": "キーフレームを削除",
+    "noMemberSelected": "メンバーを選択してください",
+    "interpolationLinear": "直線補間",
+    "interpolationEaseInOut": "曲線補間"
+  },
+  "member": {
+    "name": "名前",
+    "color": "カラー",
+    "namePlaceholder": "メンバー名（任意）",
+    "addMember": "メンバーを追加",
+    "editMember": "メンバーを編集",
+    "deleteMember": "メンバーを削除",
+    "noMembers": "メンバーがいません"
+  },
+  "project": {
+    "title": "タイトル",
+    "titlePlaceholder": "プロジェクト名を入力",
+    "newProject": "新規プロジェクト",
+    "createProject": "プロジェクトを作成",
+    "noProjects": "プロジェクトがありません",
+    "startNew": "新規作成して始めましょう",
+    "deleteProject": "プロジェクトを削除",
+    "deleteConfirm": "このプロジェクトを削除してもよろしいですか？"
+  },
+  "share": {
+    "shareUrl": "共有URL",
+    "copyUrl": "URLをコピー",
+    "copied": "コピーしました",
+    "shareDescription": "このURLを共有することで、フォーメーションを閲覧できます",
+    "viewOnly": "閲覧専用"
+  },
+  "export": {
+    "exportTitle": "動画を書き出し",
+    "exportDescription": "動画と床面図を合成して書き出します",
+    "startExport": "書き出し開始",
+    "exporting": "書き出し中...",
+    "exportComplete": "書き出し完了",
+    "exportError": "書き出しに失敗しました"
+  },
+  "floormap": {
+    "title": "床面図"
+  }
+}
