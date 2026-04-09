@@ -98,15 +98,33 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
         />
       </div>
 
-      {/* 動画プレイヤー（ダブルタップで動画変更） */}
+      {/* 動画プレイヤー */}
       <div
-        className="flex-shrink-0 relative cursor-pointer select-none"
+        className="flex-shrink-0 relative select-none"
         style={{ height: '40%' }}
-        onClick={handleVideoAreaTap}
+        onClick={videoUrl ? handleVideoAreaTap : undefined}
         onMouseEnter={() => setShowDoubleTapHint(true)}
         onMouseLeave={() => setShowDoubleTapHint(false)}
       >
         <VideoPlayer className="w-full h-full" />
+
+        {/* 動画未選択時：読み込みボタンを中央表示 */}
+        {!videoUrl && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex flex-col items-center gap-2 px-6 py-4 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-2xl transition-colors"
+            >
+              <svg className="w-10 h-10 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+              </svg>
+              <span className="text-white text-sm font-medium">動画を読み込む</span>
+              <span className="text-white/40 text-xs">MP4 / MOV / WebM</span>
+            </button>
+          </div>
+        )}
+
+        {/* 動画選択済み・ホバー時ヒント */}
         {videoUrl && showDoubleTapHint && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <span className="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full">
