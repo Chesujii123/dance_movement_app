@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProjectStore } from '@/stores/projectStore';
 import { usePlayerStore } from '@/stores/playerStore';
@@ -18,9 +18,11 @@ type ProjectPageProps = {
 export default function ProjectPage({ projectId }: ProjectPageProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const doubleTapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showDoubleTapHint, setShowDoubleTapHint] = useState(false);
 
-  const { projects, setCurrentProject, currentProject } = useProjectStore();
-  const { isPlaying, videoUrl, setVideoUrl } = usePlayerStore();
+  const { setCurrentProject, currentProject } = useProjectStore();
+  const { videoUrl, setVideoUrl } = usePlayerStore();
   const { isEditMode, enterEditMode } = useEditorStore();
 
   useEffect(() => {
@@ -56,6 +58,23 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
     const url = URL.createObjectURL(file);
     sessionStorage.setItem(`video_${projectId}`, url);
     setVideoUrl(url);
+    // inputをリセットして同じファイルも再選択できるようにする
+    e.target.value = '';
+  };
+
+  // ダブルタップ検出
+  const handleVideoAreaTap = () => {
+    if (doubleTapTimerRef.current) {
+      // 2回目のタップ → ダブルタップ確定
+      clearTimeout(doubleTapTimerRef.current);
+      doubleTapTimerRef.current = null;
+      fileInputRef.current?.click();
+    } else {
+      // 1回目のタップ → 300ms待つ
+      doubleTapTimerRef.current = setTimeout(() => {
+        doubleTapTimerRef.current = null;
+      }, 300);
+    }
   };
 
   return (
@@ -74,14 +93,12 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
         <h1 className="flex-1 text-white text-sm font-medium truncate px-2">
           {currentProject.title}
         </h1>
-        {!videoUrl && (
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="min-h-[44px] px-3 text-pink-400 hover:text-pink-300 text-sm"
-          >
-            動画を読み込む
-          </button>
-        )}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="min-h-[44px] px-3 text-pink-400 hover:text-pink-300 text-sm"
+        >
+          {videoUrl ? '動画を変更' : '動画を読み込む'}
+        </button>
         <input
           ref={fileInputRef}
           type="file"
@@ -91,9 +108,23 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
         />
       </div>
 
-      {/* 動画プレイヤー */}
-      <div className="flex-shrink-0" style={{ height: '40%' }}>
+      {/* 動画プレイヤー（ダブルタップで動画変更） */}
+      <div
+        className="flex-shrink-0 relative cursor-pointer select-none"
+        style={{ height: '40%' }}
+        onClick={handleVideoAreaTap}
+        onMouseEnter={() => setShowDoubleTapHint(true)}
+        onMouseLeave={() => setShowDoubleTapHint(false)}
+      >
         <VideoPlayer className="w-full h-full" />
+        {/* ダブルタップヒント（動画あり・ホバー時） */}
+        {videoUrl && showDoubleTapHint && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full">
+              ダブルタップで動画を変更
+            </span>
+          </div>
+        )}
       </div>
 
       {/* 床面図 */}
