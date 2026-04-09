@@ -18,11 +18,10 @@ type ProjectPageProps = {
 export default function ProjectPage({ projectId }: ProjectPageProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const doubleTapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showDoubleTapHint, setShowDoubleTapHint] = useState(false);
 
   const { setCurrentProject, currentProject } = useProjectStore();
-  const { videoUrl, setVideoUrl } = usePlayerStore();
+  const { videoUrl, setVideoUrl, togglePlay } = usePlayerStore();
   const { isEditMode, enterEditMode } = useEditorStore();
 
   useEffect(() => {
@@ -62,15 +61,7 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
   };
 
   const handleVideoAreaTap = () => {
-    if (doubleTapTimerRef.current) {
-      clearTimeout(doubleTapTimerRef.current);
-      doubleTapTimerRef.current = null;
-      fileInputRef.current?.click();
-    } else {
-      doubleTapTimerRef.current = setTimeout(() => {
-        doubleTapTimerRef.current = null;
-      }, 300);
-    }
+    if (videoUrl) togglePlay();
   };
 
   return (
@@ -119,7 +110,7 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
         {videoUrl && showDoubleTapHint && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <span className="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full">
-              ダブルタップで動画を変更
+              タップで再生 / 一時停止
             </span>
           </div>
         )}
