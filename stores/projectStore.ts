@@ -14,6 +14,7 @@ type ProjectStore = {
   deleteProject: (id: string) => void;
 
   addMember: (projectId: string) => void;
+  addMemberWithPosition: (projectId: string, timestamp: number) => void;
   updateMember: (projectId: string, memberId: string, updates: Partial<Member>) => void;
   deleteMember: (projectId: string, memberId: string) => void;
 
@@ -84,6 +85,40 @@ export const useProjectStore = create<ProjectStore>()(
         };
         get().updateProject(projectId, {
           members: [...project.members, member],
+        });
+      },
+
+      addMemberWithPosition: (projectId, timestamp) => {
+        const project = get().projects.find((p) => p.id === projectId);
+        if (!project) return;
+        const colorIndex = project.members.length % DEFAULT_MEMBER_COLORS.length;
+        const member: Member = {
+          id: nanoid(),
+          color: DEFAULT_MEMBER_COLORS[colorIndex],
+        };
+        const SNAP = 0.05;
+        const existingKf = project.keyframes.find(
+          (kf) => Math.abs(kf.timestamp - timestamp) <= SNAP
+        );
+        let keyframes: Keyframe[];
+        if (existingKf) {
+          keyframes = project.keyframes.map((kf) =>
+            kf.id === existingKf.id
+              ? { ...kf, positions: [...kf.positions, { memberId: member.id, x: 0.5, y: 0.5 }] }
+              : kf
+          );
+        } else {
+          const newKf: Keyframe = {
+            id: nanoid(),
+            timestamp,
+            positions: [{ memberId: member.id, x: 0.5, y: 0.5 }],
+            interpolation: 'linear',
+          };
+          keyframes = [...project.keyframes, newKf].sort((a, b) => a.timestamp - b.timestamp);
+        }
+        get().updateProject(projectId, {
+          members: [...project.members, member],
+          keyframes,
         });
       },
 
