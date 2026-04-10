@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
+import { usePlayerStore } from '@/stores/playerStore';
 import { Member } from '@/types';
 
 const PRESET_COLORS = [
@@ -136,16 +137,51 @@ function MemberItem({ member, projectId }: MemberItemProps) {
 }
 
 export default function MemberList() {
-  const { currentProject, addMember } = useProjectStore();
+  const { currentProject, addMember, addKeyframe, updateKeyframe } = useProjectStore();
+  const { currentTime } = usePlayerStore();
 
   if (!currentProject) return null;
+
+  const handleAddMember = () => {
+    // メンバーを追加（追加後の最新プロジェクトから新メンバーのIDを取得）
+    addMember(currentProject.id);
+
+    // addMember は同期的にstoreを更新するので、次のマイクロタスクで最新stateを参照
+    setTimeout(() => {
+      const latest = useProjectStore.getState().currentProject;
+      if (!latest) return;
+      const newMember = latest.members[latest.members.length - 1];
+      if (!newMember) return;
+
+      // 現在時刻に近いキーフレームがあれば、そこに位置を追加。なければ新規作成
+      const SNAP = 0.05; // 50ms以内なら同じキーフレームとみなす
+      const existing = latest.keyframes.find(
+        (kf) => Math.abs(kf.timestamp - currentTime) <= SNAP
+      );
+
+      if (existing) {
+        updateKeyframe(latest.id, existing.id, {
+          positions: [
+            ...existing.positions,
+            { memberId: newMember.id, x: 0.5, y: 0.5 },
+          ],
+        });
+      } else {
+        addKeyframe(latest.id, {
+          timestamp: currentTime,
+          positions: [{ memberId: newMember.id, x: 0.5, y: 0.5 }],
+          interpolation: 'linear',
+        });
+      }
+    }, 0);
+  };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-white font-semibold text-sm">メンバー</h3>
         <button
-          onClick={() => addMember(currentProject.id)}
+          onClick={handleAddMember}
           className="min-h-[36px] px-3 bg-pink-600 hover:bg-pink-500 text-white text-xs rounded-lg transition-colors"
         >
           + 追加
