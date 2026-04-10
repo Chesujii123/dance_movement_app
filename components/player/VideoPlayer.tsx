@@ -46,11 +46,7 @@ export default function VideoPlayer({ className }: VideoPlayerProps) {
 
   return (
     <div className={`relative bg-black ${className ?? ''}`}>
-      {!videoUrl && (
-        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-          <p className="text-sm">{t('loadVideoDescription')}</p>
-        </div>
-      )}
+
       <video
         ref={videoRef}
         className="w-full h-full object-contain"
