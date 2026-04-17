@@ -29,11 +29,11 @@ export default function ProjectPage({ projectId }: ProjectPageProps) {
   }, [projectId, setCurrentProject]);
 
   useEffect(() => {
-    if (!videoUrl) {
-      const cached = sessionStorage.getItem(`video_${projectId}`);
-      if (cached) setVideoUrl(cached);
-    }
-  }, [projectId, videoUrl, setVideoUrl]);
+    // プロジェクトが切り替わったら動画をリセットし、そのプロジェクト用のキャッシュを読み込む
+    setVideoUrl(null);
+    const cached = sessionStorage.getItem(`video_${projectId}`);
+    if (cached) setVideoUrl(cached);
+  }, [projectId, setVideoUrl]);
 
   if (!currentProject) {
     return (
