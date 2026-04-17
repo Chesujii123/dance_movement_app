@@ -32,6 +32,7 @@ export default function FloorMapCanvas({
   const animFrameRef = useRef<number>(0);
   const isDraggingRef = useRef(false);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
+  const draggingMemberIdRef = useRef<string | null>(null);
 
   const { selectedMemberId, setSelectedMemberId, pushUndo } = useEditorStore();
   const { updateKeyframe, addKeyframe, currentProject } = useProjectStore();
@@ -176,15 +177,18 @@ export default function FloorMapCanvas({
       if (hit) {
         setSelectedMemberId(hit.memberId);
         isDraggingRef.current = true;
+        draggingMemberIdRef.current = hit.memberId;
         dragStartRef.current = { x, y };
         canvas.setPointerCapture(e.pointerId);
       } else {
         setSelectedMemberId(null);
+        draggingMemberIdRef.current = null;
       }
     };
 
     const handlePointerMove = (e: PointerEvent) => {
-      if (!isDraggingRef.current || !selectedMemberId) return;
+      const draggingMemberId = draggingMemberIdRef.current;
+      if (!isDraggingRef.current || !draggingMemberId) return;
       e.preventDefault();
       const { x, y } = getCanvasPos(e, canvas);
       const clampedX = Math.max(0, Math.min(1, x));
@@ -197,15 +201,15 @@ export default function FloorMapCanvas({
 
       if (existingKf) {
         const updatedPositions = existingKf.positions.map((p) =>
-          p.memberId === selectedMemberId ? { ...p, x: clampedX, y: clampedY } : p
+          p.memberId === draggingMemberId ? { ...p, x: clampedX, y: clampedY } : p
         );
-        if (!updatedPositions.find((p) => p.memberId === selectedMemberId)) {
-          updatedPositions.push({ memberId: selectedMemberId, x: clampedX, y: clampedY });
+        if (!updatedPositions.find((p) => p.memberId === draggingMemberId)) {
+          updatedPositions.push({ memberId: draggingMemberId, x: clampedX, y: clampedY });
         }
         updateKeyframe(projectId, existingKf.id, { positions: updatedPositions });
       } else {
         const positions = interpolatePositions(keyframes, currentTime).map((p) =>
-          p.memberId === selectedMemberId ? { ...p, x: clampedX, y: clampedY } : p
+          p.memberId === draggingMemberId ? { ...p, x: clampedX, y: clampedY } : p
         );
         addKeyframe(projectId, {
           timestamp: currentTime,
@@ -227,6 +231,7 @@ export default function FloorMapCanvas({
         pushUndo(keyframes);
       }
       isDraggingRef.current = false;
+      draggingMemberIdRef.current = null;
       dragStartRef.current = null;
     };
 
@@ -243,7 +248,6 @@ export default function FloorMapCanvas({
     isEditMode,
     keyframes,
     currentTime,
-    selectedMemberId,
     projectId,
     getCanvasPos,
     draw,
